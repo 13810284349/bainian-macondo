@@ -62,7 +62,7 @@ const fallbackSections = [
     section_order: 6,
     label: "Images",
     title: "从冰块到蚂蚁的符号地图",
-    summary: "冰块、雨、金小鱼、黄蝶、羊皮卷和蚂蚁既推动阅读，也把历史、欲望和终结变得可见。",
+    summary: "冰块、雨、金小鱼、黄蝴蝶、羊皮卷和蚂蚁既推动阅读，也把历史、欲望和终结变得可见。",
     metric: "意象系统",
     accent: "那些物象比人物更早知道结局。",
     lens: ["image"],
