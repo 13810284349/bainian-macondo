@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关于百年 | 马孔多时间档案</title>
+  <meta name="description" content="关于《百年孤独》的全书深度总体分析：时间循环、马孔多、布恩迪亚家族、意象系统、历史隐喻与阅读路径。">
+  <meta name="theme-color" content="#10231d">
+  <meta property="og:title" content="关于百年 | 马孔多时间档案">
+  <meta property="og:description" content="从时间、孤独、家族、意象与历史政治进入《百年孤独》的深度阅读页面。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/macondo-hero.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;700;900&family=Spectral:ital,wght@0,400;0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link rel="preload" href="assets/macondo-hero.png" as="image">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <div class="progress" aria-hidden="true"><span id="scroll-progress"></span></div>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="关于百年首页">
+      <span class="brand-mark">百</span>
+      <span>关于百年</span>
+    </a>
+    <nav aria-label="主导航">
+      <a href="#atlas">分析地图</a>
+      <a href="#lineage">家族谱系</a>
+      <a href="#method">阅读方法</a>
+      <a href="deck.html">原始 Deck</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <picture class="hero-art">
+        <img src="assets/macondo-hero.png" alt="雨林、羊皮卷地图、火车与黄蝶交织成的马孔多意象插画">
+      </picture>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <p class="eyebrow">Macondo Reading Archive</p>
+        <h1 id="hero-title">百年孤独</h1>
+        <p class="hero-copy">
+          一部小说，六个入口：时间、家族、孤独、意象、历史与形式。马孔多不是地点，而是历史被折叠之后仍会发烫的纸页。
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#atlas">进入分析地图</a>
+          <a class="button ghost" href="deck.html">查看全书演示稿</a>
+        </div>
+        <dl class="hero-facts" aria-label="页面摘要">
+          <div>
+            <dt>20</dt>
+            <dd>章回总体分析</dd>
+          </div>
+          <div>
+            <dt>7</dt>
+            <dd>代布恩迪亚家族</dd>
+          </div>
+          <div>
+            <dt>9</dt>
+            <dd>阅读入口</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="opening" aria-labelledby="opening-title">
+      <div class="section-kicker">About the Page</div>
+      <div class="opening-grid">
+        <h2 id="opening-title">这不是一份情节摘要，而是一座时间迷宫的入口。</h2>
+        <div class="opening-copy">
+          <p>
+            目录中的全书分析已经把《百年孤独》拆成多个互相照亮的系统：圆形时间、空间衰败、名字的遗传、孤独的变奏、魔幻现实主义、香蕉公司与历史失忆。
+          </p>
+          <p>
+            这个页面把那些内容重新整理成可公开访问的阅读档案。你可以从任何一个入口开始，最后都会被带回同一个中心：人如何在孤独中建立世界，又如何亲手把世界交给风。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section dark-band" id="atlas" aria-labelledby="atlas-title">
+      <div class="section-head">
+        <p class="section-kicker">Supabase Atlas</p>
+        <h2 id="atlas-title">九个入口，同时指向马孔多的中心</h2>
+        <p>
+          下方章节由 Supabase 公共内容表加载；网络不可用时，会自动使用页面内置的文学档案。
+        </p>
+      </div>
+
+      <div class="lens-bar" aria-label="阅读镜头">
+        <button class="lens is-active" type="button" data-lens="all" aria-pressed="true">全部</button>
+        <button class="lens" type="button" data-lens="time" aria-pressed="false">时间</button>
+        <button class="lens" type="button" data-lens="lineage" aria-pressed="false">家族</button>
+        <button class="lens" type="button" data-lens="image" aria-pressed="false">意象</button>
+        <button class="lens" type="button" data-lens="history" aria-pressed="false">历史</button>
+      </div>
+
+      <div class="source-line">
+        <span id="data-source">正在连接 Supabase</span>
+        <span id="section-count">0 个入口</span>
+      </div>
+
+      <div class="analysis-grid" id="sections-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="section split-section" id="lineage" aria-labelledby="lineage-title">
+      <div class="portrait-panel">
+        <p class="section-kicker">Buendia Lineage</p>
+        <h2 id="lineage-title">布恩迪亚家的名字，是命运反复抄写自己。</h2>
+        <p>
+          何塞·阿尔卡蒂奥系列向外冲撞，靠身体、欲望、行动和出走来确认世界；奥雷里亚诺系列向内凝视，在作坊、战争、金小鱼和沉默中把自己越关越深。
+        </p>
+      </div>
+      <div class="lineage-table" role="list" aria-label="人物阅读线索">
+        <article role="listitem">
+          <span>01</span>
+          <h3>向外的人</h3>
+          <p>冒险、肉体、离家、失控。名字像一扇向热带旷野打开的门。</p>
+        </article>
+        <article role="listitem">
+          <span>02</span>
+          <h3>向内的人</h3>
+          <p>沉默、洞察、战争、作坊。名字像一间越走越深的房间。</p>
+        </article>
+        <article role="listitem">
+          <span>03</span>
+          <h3>守护的人</h3>
+          <p>乌尔苏拉、阿玛兰妲、丽贝卡、费尔南达把家族的秩序、拒绝、流放和幻觉撑到最后。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="image-river" aria-labelledby="river-title">
+      <div class="section-kicker">Image System</div>
+      <h2 id="river-title">冰块、雨、黄蝶、羊皮卷与蚂蚁，构成一张会呼吸的符号地图。</h2>
+      <div class="river-track" role="list">
+        <article role="listitem">
+          <span>冰块</span>
+          <p>科学启蒙和童年奇迹，也是纯真被时间冻结的第一块证物。</p>
+        </article>
+        <article role="listitem">
+          <span>雨</span>
+          <p>不是天气，而是历史无法排水时形成的漫长停滞。</p>
+        </article>
+        <article role="listitem">
+          <span>黄蝶</span>
+          <p>爱情的踪迹，也是命运在空气里留下的可见粉尘。</p>
+        </article>
+        <article role="listitem">
+          <span>羊皮卷</span>
+          <p>命运、书写、阅读和存在在同一刻重叠的元叙事核心。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section history-section" aria-labelledby="history-title">
+      <div class="section-head compact">
+        <p class="section-kicker">History Beneath Magic</p>
+        <h2 id="history-title">私人冲突一路长成国家恐怖。</h2>
+        <p>
+          小说把殖民记忆、内战循环、外来资本、香蕉公司屠杀与官方失忆嵌进家族日常。魔幻不是逃避现实，而是现实被压迫到只能以荒诞显形。
+        </p>
+      </div>
+      <div class="history-grid">
+        <article>
+          <strong>战争</strong>
+          <p>三十二场战争把理想消耗成惯性，胜负不再通向更新，只通向更深的虚无。</p>
+        </article>
+        <article>
+          <strong>火车</strong>
+          <p>现代性进入马孔多，带来速度、商品和外部秩序，也带来土地被重新编码的命运。</p>
+        </article>
+        <article>
+          <strong>香蕉公司</strong>
+          <p>资本把城镇变成生产现场，又把死者从官方叙述中抹去。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section method-section" id="method" aria-labelledby="method-title">
+      <p class="section-kicker">Reading Method</p>
+      <h2 id="method-title">不要只追情节，追那些回声。</h2>
+      <div class="method-grid">
+        <article>
+          <span>01</span>
+          <h3>追踪时间</h3>
+          <p>看“多年以后”、终章阅读和羊皮卷如何让过去、现在、未来压缩在同一页。</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>追踪名字</h3>
+          <p>把何塞·阿尔卡蒂奥与奥雷里亚诺分开看，再看名字如何把性格变成家族语法。</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>追踪意象</h3>
+          <p>把冰、雨、黄蝶、金小鱼、蚂蚁和羊皮卷当作路标，沿着它们回到同一个中心。</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>关于百年 · 马孔多时间档案</p>
+    <p>Built with GitHub, Supabase and Netlify</p>
+  </footer>
+
+  <script src="assets/site.js" defer></script>
+</body>
+</html>

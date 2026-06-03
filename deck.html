@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>百年孤独全书深度总体分析 · 时间的迷宫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@300;400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ============ 主题色(默认:🖋 墨水经典) ============
+       切换主题:从 references/themes.md 复制对应的 :root 块
+       整体替换这几行(--ink / --ink-rgb / --paper / --paper-rgb)
+       其他地方散落的 rgba() 都走 var(--ink-rgb) / var(--paper-rgb),无需逐处改 */
+    --ink:#2a1e13;
+    --ink-rgb:42,30,19;
+    --paper:#eedfc7;
+    --paper-rgb:238,223,199;
+    --paper-tint:#e0d0b6;
+    --ink-tint:#3a2a1d;
+
+    /* ============ 字体(跨主题固定) ============ */
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --serif-en:"Playfair Display","Source Serif 4",Georgia,serif;
+    --serif-body-en:"Source Serif 4",Georgia,serif;
+    --serif-zh:"Noto Serif SC",source-han-serif-sc,serif;
+    --sans-zh:"Noto Sans SC",source-han-sans-sc,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--paper);font-family:var(--sans-zh);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+  /* ============ WebGL 双背景 ============ */
+  canvas.bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;transition:opacity 1.2s ease}
+  canvas#bg-light{opacity:0}
+  canvas#bg-dark{opacity:1}
+  body.light-bg canvas#bg-light{opacity:1}
+  body.light-bg canvas#bg-dark{opacity:0}
+  body.low-power canvas.bg{display:none!important}
+
+  /* ============ Deck 容器 + 翻页 ============ */
+  /* width: NSLIDES * 100vw，会在 JS 里动态矫正 */
+  #deck{position:fixed;inset:0;width:10000vw;height:100vh;display:flex;flex-wrap:nowrap;transition:transform .9s cubic-bezier(.77,0,.175,1);z-index:10;will-change:transform}
+  .slide{width:100vw;height:100vh;flex:0 0 100vw;position:relative;padding:6vh 6vw 10vh 6vw;display:flex;flex-direction:column;overflow:hidden}
+  .slide.light{color:var(--ink);background:var(--paper)}
+  .slide.dark{color:var(--paper);background:var(--ink)}
+
+  /* 默认页：遮罩较厚，保证文字可读 */
+  .slide::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;transition:background .7s ease}
+  .slide.light::before{background:rgba(var(--paper-rgb),.78);backdrop-filter:blur(3px)}
+  .slide.dark::before{background:rgba(var(--ink-rgb),.78);backdrop-filter:blur(3px)}
+  /* Hero 页：遮罩大幅降低，让 WebGL 背景明显透出 */
+  .slide.hero.light::before{background:rgba(var(--paper-rgb),.16);backdrop-filter:none}
+  .slide.hero.dark::before{background:rgba(var(--ink-rgb),.12);backdrop-filter:none}
+  /* Hero 页顶底微弱渐隐，保证 chrome/foot 区域可读 */
+  .slide.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
+  .slide.hero.light::after{background:linear-gradient(180deg,rgba(var(--paper-rgb),.28) 0%,rgba(var(--paper-rgb),0) 14%,rgba(var(--paper-rgb),0) 86%,rgba(var(--paper-rgb),.28) 100%)}
+  .slide.hero.dark::after{background:linear-gradient(180deg,rgba(var(--ink-rgb),.32) 0%,rgba(var(--ink-rgb),0) 14%,rgba(var(--ink-rgb),0) 86%,rgba(var(--ink-rgb),.32) 100%)}
+
+  /* ============ Magazine chrome：顶部 meta + 底部 foot ============ */
+  .chrome{display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+  .chrome .left,.chrome .right{display:flex;gap:2.4em;align-items:center}
+  .chrome .sep{width:40px;height:1px;background:currentColor;opacity:.4}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.55}
+  .foot .title{font-family:var(--serif-zh);font-weight:400;letter-spacing:.05em;text-transform:none;opacity:.75;font-size:13px}
+
+  .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;padding:6px 14px;border:1px solid currentColor;opacity:.85}
+  .rule{width:100%;height:1px;background:currentColor;opacity:.25;margin:3vh 0}
+  .rule.v{width:1px;height:100%;margin:0}
+
+  /* ============ 字体规则 ============
+     · 衬线（Noto Serif SC / Playfair）：大标题、重点金句、数字
+     · 非衬线（Noto Sans SC）：正文描述、body、补充说明
+     · 等宽（IBM Plex Mono）：kicker、meta 小标签、foot 右侧
+  */
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;opacity:.6;margin-bottom:2.6vh}
+  .display{font-family:var(--serif-en);font-weight:700;font-size:11vw;line-height:.92;letter-spacing:-.025em}
+  .display-zh{font-family:var(--serif-zh);font-weight:700;font-size:7.8vw;line-height:1.04;letter-spacing:-.005em}
+  .h1-zh{font-family:var(--serif-zh);font-weight:700;font-size:4.6vw;line-height:1.12;letter-spacing:-.005em}
+  .h2-zh{font-family:var(--serif-zh);font-weight:600;font-size:3.2vw;line-height:1.2;letter-spacing:0}
+  .h3-zh{font-family:var(--serif-zh);font-weight:500;font-size:1.9vw;line-height:1.35}
+  .body-zh{font-family:var(--sans-zh);font-weight:400;font-size:max(15px,1.22vw);line-height:1.75;opacity:.82;letter-spacing:.01em}
+  .body-serif{font-family:var(--serif-zh);font-weight:400;font-size:max(15px,1.3vw);line-height:1.65;opacity:.88}
+  .lead{font-family:var(--serif-zh);font-weight:400;font-size:1.9vw;line-height:1.4;opacity:.85}
+  .meta{font-family:var(--mono);font-size:max(11px,.88vw);letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+  .big-num{font-family:var(--serif-en);font-weight:800;font-size:10vw;line-height:.85;letter-spacing:-.03em;font-feature-settings:"tnum"}
+  .mid-num{font-family:var(--serif-en);font-weight:700;font-size:5.5vw;line-height:.88;letter-spacing:-.02em;font-feature-settings:"tnum"}
+  .ghost{font-family:var(--serif-en);font-weight:900;font-size:34vw;line-height:.8;opacity:.06;letter-spacing:-.04em;position:absolute;font-feature-settings:"tnum"}
+  em{font-style:italic;font-family:var(--serif-en)}
+  .en{font-family:var(--serif-en);font-style:italic;font-weight:500}
+
+  /* ============ 布局工具 ============ */
+  .col{display:flex;flex-direction:column;gap:2.4vh}
+  .row{display:flex;align-items:center;gap:3vw}
+  .grid-6{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:4vw 6vw;flex:1;align-content:center;padding:2vh 0}
+  .grid-9{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:3vh 4vw;flex:1;align-content:center}
+  .grid-4{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:4vh 6vw;flex:1;align-content:center}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:4vw;flex:1;align-content:center}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:4vw;flex:1;align-items:center}
+  .split-55{display:grid;grid-template-columns:55fr 45fr;gap:5vw;flex:1;align-items:stretch}
+  .fill{flex:1}
+  .center{align-items:center;justify-content:center;text-align:center}
+  .bottom-left{position:absolute;left:6vw;bottom:9vh;max-width:50vw}
+  .bottom-right{position:absolute;right:6vw;bottom:9vh;max-width:50vw;text-align:right}
+  .top-right{position:absolute;right:6vw;top:6vh;text-align:right}
+
+  /* ============ Stat（数字矩阵） ============ */
+  .stat{display:flex;flex-direction:column;gap:1vh;align-items:flex-start}
+  .stat .n{font-family:var(--serif-en);font-weight:800;font-size:8vw;line-height:.88;letter-spacing:-.03em;font-feature-settings:"tnum"}
+  .stat .l{font-family:var(--sans-zh);font-size:max(13px,1.05vw);opacity:.7;margin-top:1vh;font-weight:400;line-height:1.5}
+  .stat .m{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.5;margin-bottom:.2vh}
+
+  /* ============ Callout（引用框） ============ */
+  .callout{padding:3vh 2.4vw;border-left:3px solid currentColor;position:relative;font-family:var(--serif-zh);font-size:max(15px,1.2vw);line-height:1.55;opacity:.92}
+  .slide.light .callout{background:rgba(var(--ink-rgb),.05)}
+  .slide.dark .callout{background:rgba(var(--paper-rgb),.06)}
+  .callout .cite{display:block;margin-top:1.6vh;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+  .callout .q-big{font-family:var(--serif-zh);font-weight:600;font-size:max(17px,1.6vw);line-height:1.42}
+
+  /* ============ Platform（平台卡） ============ */
+  .plat{display:flex;flex-direction:column;justify-content:flex-end;padding:2vh 0;border-top:1px solid currentColor;border-color:rgba(127,127,127,.35)}
+  .plat .name{font-family:var(--serif-zh);font-weight:700;font-size:1.8vw;margin-bottom:.6vh}
+  .plat .nb{font-family:var(--serif-en);font-weight:700;font-size:3.2vw;letter-spacing:-.02em;line-height:1;font-feature-settings:"tnum"}
+  .plat .sub{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.55;margin-top:.6vh}
+  .plat .fill{font-family:var(--sans-zh);font-weight:300;font-size:2.4vw;opacity:.28;letter-spacing:-.01em;line-height:1}
+
+  /* ============ Rowline（表格行） ============ */
+  .rowline{display:grid;grid-template-columns:1fr 2fr 1fr;gap:2vw;padding:2.2vh 0;border-top:1px solid currentColor;align-items:center;border-color:rgba(127,127,127,.25)}
+  .rowline:last-child{border-bottom:1px solid currentColor;border-color:rgba(127,127,127,.25)}
+  .rowline .k{font-family:var(--serif-zh);font-weight:700;font-size:1.7vw}
+  .rowline .v{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.2vw);opacity:.85;line-height:1.55}
+  .rowline .m{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;justify-self:end}
+
+  /* ============ Pillar（支柱卡片） ============ */
+  .pillar{display:flex;flex-direction:column;gap:1.8vh}
+  .pillar .ic{font-family:var(--serif-en);font-style:italic;font-size:2.6vw;opacity:.45;font-weight:400}
+  .pillar .ic svg{width:2.8vw;height:2.8vw;stroke-width:1.2;opacity:.7}
+  .pillar .t{font-family:var(--serif-zh);font-weight:700;font-size:2.4vw;line-height:1.1}
+  .pillar .d{font-family:var(--sans-zh);font-weight:400;font-size:max(14px,1.1vw);opacity:.76;line-height:1.6}
+
+  /* ============ Signature / Highlight ============ */
+  .sign{font-family:var(--serif-en);font-style:italic;font-weight:500;font-size:2vw;opacity:.7}
+  .hi{position:relative;display:inline}
+  .slide.dark .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--paper-rgb),.15);z-index:-1}
+  .slide.light .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--ink-rgb),.08);z-index:-1}
+
+  /* ============ Icons（Lucide via CDN） ============ */
+  .ico{width:1em;height:1em;display:inline-block;vertical-align:-.12em;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .ico-lg,.ico-md,.ico-sm{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+  .ico-lg{width:2.6vw;height:2.6vw;stroke-width:1.2;display:inline-block}
+  .ico-md{width:1.8vw;height:1.8vw;stroke-width:1.3;display:inline-block;vertical-align:-.4em}
+  .ico-sm{width:1.1vw;height:1.1vw;stroke-width:1.4;display:inline-block;vertical-align:-.15em;opacity:.7}
+
+  /* ============ 图片占位（虚线框，提示设计师位置） ============ */
+  .img-slot{border:1.5px dashed rgba(127,127,127,.4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1vh;padding:2vh 2vw;font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;opacity:.55;position:relative;aspect-ratio:16/9;width:100%;max-height:56vh;margin-inline:auto;box-sizing:border-box}
+  .img-slot::before{content:"";position:absolute;inset:8px;border:1px solid currentColor;opacity:.2}
+  .img-slot .plus{font-size:2vw;font-weight:300;opacity:.5;letter-spacing:0}
+  .img-slot .label{position:relative;z-index:2;text-align:center}
+  .img-slot.r-4x3{aspect-ratio:4/3}
+  .img-slot.r-3x2{aspect-ratio:3/2}
+  .img-slot.r-1x1{aspect-ratio:1/1}
+
+  /* ============ 图片实填框（关键：固定高度 + 只裁底部） ============
+     重要约束：高度用内联 height:Nvh 精确控制，不要用 aspect-ratio（会撑破布局）
+     object-position:top center 保证严禁裁剪顶部和左右，只裁剪底部
+  */
+  .frame-img{overflow:hidden;position:relative;background:rgba(0,0,0,.04);box-sizing:border-box;width:100%;border-radius:4px}
+  .slide.dark .frame-img{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
+  .frame-img > img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .frame-img.fit-contain > img{object-fit:contain;object-position:center center}
+  .frame-img.r-16x9{aspect-ratio:16/9;max-height:64vh}
+  .frame-img.r-16x10{aspect-ratio:16/10;max-height:56vh}
+  .frame-img.r-4x3{aspect-ratio:4/3;max-height:56vh}
+  .frame-img.r-3x2{aspect-ratio:3/2;max-height:46vh}
+  .frame-img.r-3x4{aspect-ratio:3/4;max-height:60vh}
+  .frame-img.r-1x1{aspect-ratio:1/1;max-height:50vh}
+  .frame-img.h-16{height:16vh}
+  .frame-img.h-18{height:18vh}
+  .frame-img.h-22{height:22vh}
+  .frame-img.h-26{height:26vh}
+  .frame-img.h-28{height:28vh}
+  .frame-cap{display:flex;justify-content:space-between;align-items:baseline;gap:1vw;margin-top:.8vh;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.72}
+  .frame-cap .pf{font-family:var(--serif-zh);font-weight:600;font-size:max(13px,1vw);letter-spacing:.04em;text-transform:none;opacity:.94}
+  .frame-cap .nb{font-family:var(--serif-en);font-style:italic;font-size:max(15px,1.2vw);letter-spacing:.02em;text-transform:none;opacity:.88}
+  .frame-cap .idx{font-family:var(--mono);opacity:.5}
+  figure.tile{display:flex;flex-direction:column;margin:0;min-width:0}
+  figure.tile > .frame-img{flex:0 0 auto}
+
+  /* ============ 导航 ============ */
+  #nav{position:fixed;left:50%;bottom:2.6vh;transform:translateX(-50%);z-index:30;display:flex;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #nav .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s ease;border:0;padding:0}
+  #nav .dot:hover{background:rgba(255,255,255,.5);transform:scale(1.15)}
+  #nav .dot.active{background:rgba(255,255,255,.95);width:22px;border-radius:999px}
+  body.light-bg #nav{background:rgba(255,255,255,.25)}
+  body.light-bg #nav .dot{background:rgba(var(--ink-rgb),.25)}
+  body.light-bg #nav .dot.active{background:rgba(var(--ink-rgb),.9)}
+  #hint{position:fixed;bottom:3vh;right:3vw;z-index:30;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.4;mix-blend-mode:difference;color:#aaa}
+  body.low-power #hint{opacity:.72;color:var(--paper);mix-blend-mode:normal}
+  body.light-bg.low-power #hint{color:var(--ink)}
+
+  /* ============================================================
+     ============ LAYOUTS API · 面向 agent 的类（v2）============
+     所有 layouts.md 中的骨架都基于下面这套命名。
+     如果你在 layouts.md 里看到某个类，它必须在下面有定义。
+     ============================================================ */
+
+  /* ---------- .frame：每页主内容容器 ---------- */
+  .frame{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  /* 当 .frame 同时加了 grid 类时，grid 的 display:grid 覆盖 flex */
+  .frame.grid-2-7-5,
+  .frame.grid-2-6-6,
+  .frame.grid-2-8-4,
+  .frame.grid-3-3,
+  .frame.grid-6{display:grid}
+
+  /* ---------- 标题层级（API 名称，衬线为主） ---------- */
+  .h-hero{
+    font-family:var(--serif-zh);
+    font-weight:900;
+    font-size:10vw;
+    line-height:.96;
+    letter-spacing:-.02em;
+  }
+  .h-xl{
+    font-family:var(--serif-zh);
+    font-weight:700;
+    font-size:6.2vw;
+    line-height:1.08;
+    letter-spacing:-.01em;
+  }
+  .h-sub{
+    font-family:var(--serif-zh);
+    font-weight:500;
+    font-size:3.1vw;
+    line-height:1.25;
+    letter-spacing:0;
+    opacity:.7;
+  }
+  .h-md{
+    font-family:var(--serif-zh);
+    font-weight:600;
+    font-size:2.3vw;
+    line-height:1.3;
+  }
+  /* 英文标题专用（Playfair 衬线） */
+  .h-hero-en,.h-xl-en{font-family:var(--serif-en);letter-spacing:-.025em}
+
+  /* ---------- lead 引语 ---------- */
+  .lead{
+    font-family:var(--serif-zh);
+    font-weight:400;
+    font-size:1.75vw;
+    line-height:1.5;
+    opacity:.86;
+  }
+
+  /* ---------- meta-row 底部元数据 ---------- */
+  .meta-row{
+    display:flex;
+    gap:1.2em;
+    align-items:baseline;
+    flex-wrap:wrap;
+    font-family:var(--mono);
+    font-size:max(12px,.92vw);
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    opacity:.6;
+  }
+
+  /* ---------- stat-card（数据大字报用） ---------- */
+  .stat-card{
+    display:flex;
+    flex-direction:column;
+    gap:.8vh;
+    align-items:flex-start;
+    padding-top:1.6vh;
+    border-top:1px solid currentColor;
+    border-color:rgba(127,127,127,.3);
+  }
+  .stat-card .stat-label{
+    font-family:var(--mono);
+    font-size:max(10px,.78vw);
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    opacity:.55;
+  }
+  .stat-card .stat-nb{
+    font-family:var(--serif-en);
+    font-weight:800;
+    font-size:5.8vw;
+    line-height:.9;
+    letter-spacing:-.03em;
+    font-feature-settings:"tnum";
+    margin-top:.4vh;
+  }
+  .stat-card .stat-nb .stat-unit{
+    font-family:var(--serif-zh);
+    font-weight:500;
+    font-size:.38em;
+    letter-spacing:0;
+    opacity:.72;
+    margin-left:.14em;
+  }
+  .stat-card .stat-note{
+    font-family:var(--sans-zh);
+    font-weight:400;
+    font-size:max(13px,1.05vw);
+    line-height:1.5;
+    opacity:.72;
+    margin-top:.6vh;
+  }
+  /* 当 stat-card 用于 grid-4（2x2），数字适度放大；若页面有标题+引文在上方，可内联 style 覆盖为更小值 */
+  .grid-4 .stat-card .stat-nb{font-size:5vw}
+  /* 当只有 3 个，字也可以稍大 */
+  .grid-3 .stat-card .stat-nb{font-size:6.8vw}
+
+  /* ---------- pipeline（流水线） ---------- */
+  .pipeline-section{
+    margin-top:4.4vh;
+    padding-top:2.8vh;
+    border-top:1px dashed rgba(127,127,127,.32);
+  }
+  .pipeline-section:first-of-type{
+    border-top:0;
+    padding-top:0;
+    margin-top:3vh;
+  }
+  .pipeline-label{
+    font-family:var(--mono);
+    font-size:max(11px,.85vw);
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    opacity:.62;
+    margin-bottom:2.2vh;
+  }
+  .pipeline{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:1.2vw;
+  }
+  .pipeline[data-cols="3"]{grid-template-columns:repeat(3,1fr)}
+  .pipeline[data-cols="4"]{grid-template-columns:repeat(4,1fr)}
+  .pipeline[data-cols="6"]{grid-template-columns:repeat(6,1fr)}
+  .step{
+    display:flex;
+    flex-direction:column;
+    gap:.8vh;
+    padding-top:1.4vh;
+    border-top:1px solid currentColor;
+    border-color:rgba(127,127,127,.35);
+  }
+  .step-nb{
+    font-family:var(--serif-en);
+    font-style:italic;
+    font-weight:500;
+    font-size:1.15vw;
+    opacity:.45;
+  }
+  .step-title{
+    font-family:var(--sans-zh);
+    font-weight:700;
+    font-size:1.55vw;
+    letter-spacing:.01em;
+    line-height:1.2;
+  }
+  .step-desc{
+    font-family:var(--sans-zh);
+    font-weight:400;
+    font-size:max(12px,.95vw);
+    line-height:1.45;
+    opacity:.72;
+  }
+
+  /* ---------- 网格（layouts.md 所用） ---------- */
+  /* 这些类独立挂到任何容器上都能生效，不依赖 .frame 复合选择器 */
+  .grid-2-7-5{display:grid;grid-template-columns:7fr 5fr;gap:3vw 4vh;align-items:start}
+  .grid-2-6-6{display:grid;grid-template-columns:1fr 1fr;gap:3vw 4vh;align-items:start}
+  .grid-2-8-4{display:grid;grid-template-columns:8fr 4fr;gap:3vw 4vh;align-items:start}
+  .grid-3-3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    grid-auto-rows:minmax(0,1fr);
+    gap:2.4vh 2vw;
+  }
+  /* grid-6 已在旧样式里定义为 3x2，这里仅补 align */
+
+  /* ---------- 图片 frame-img（layouts.md 主命名） ---------- */
+  /* 在旧样式里已定义，这里补 img-cap 命名别名与增强 */
+  figure.frame-img{margin:0;display:flex;flex-direction:column;min-width:0}
+  .img-cap{
+    display:block;
+    margin-top:.8vh;
+    font-family:var(--mono);
+    font-size:max(10px,.8vw);
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    opacity:.6;
+  }
+  /* callout src 命名别名 */
+  .callout-src{
+    display:block;
+    margin-top:1.6vh;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    opacity:.6;
+  }
+
+  /* ---------- chrome & foot 补位（layouts.md 简单写法） ---------- */
+  .chrome{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.2em;text-transform:uppercase;opacity:.62}
+  .foot{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.18em;text-transform:uppercase;opacity:.5}
+
+  /* ============ 动效系统(Motion One 驱动) ============
+     所有 [data-anim] 元素默认隐藏,进入页面时由 JS 逐个揭示。
+     - cascade(默认):按 DOM 顺序 stagger 120ms 淡入 + y:16→0
+     - hero(hero 页自动):慢一点的 stagger 180ms
+     - quote(含 [data-anim="line"]):逐行 600ms 淡入
+     - directional(含 [data-anim="left|right"]):左→分隔线→右
+     - pipeline(data-animate="pipeline"):Space/→ 手动推进
+     Motion One 没加载成功时(CDN 断 + 本地丢),所有 [data-anim] 会兜底显示。
+  */
+  [data-anim]{opacity:1}
+  body.motion-ready [data-anim]{opacity:0}
+  body.motion-ready [data-anim="left"]{transform:translateX(-24px)}
+  body.motion-ready [data-anim="right"]{transform:translateX(24px)}
+  body.motion-ready [data-anim="line"]{opacity:0;transform:translateY(10px)}
+  body.motion-ready [data-animate="pipeline"] [data-anim]{opacity:.15}
+  body.low-power #deck{transition:none!important}
+  body.low-power *,
+  body.low-power *::before,
+  body.low-power *::after{animation:none!important;transition:none!important}
+  body.low-power.motion-ready [data-anim],
+  body.low-power [data-anim]{opacity:1!important;transform:none!important}
+
+  /* ---------- 响应式降级 ---------- */
+  @media (max-width:900px){
+    .display{font-size:16vw}
+    .display-zh{font-size:12vw}
+    .h1-zh{font-size:7vw}
+    .h-hero{font-size:14vw}
+    .h-xl{font-size:9vw}
+    .pipeline{grid-template-columns:repeat(2,1fr)}
+    .grid-2-7-5,.grid-2-6-6,.grid-2-8-4{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<script>
+  (function(){
+    const KEY = 'guizang-ppt-low-power';
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stored = localStorage.getItem(KEY);
+    window.__lowPowerMode = stored === '1' || (stored === null && reduced);
+    function updateHint(){
+      const hint = document.getElementById('hint');
+      if(hint) hint.textContent = `← → 翻页 · B ${window.__lowPowerMode ? '动态' : '静态'} · ESC 索引`;
+    }
+    window.__setLowPowerMode = function(on, opts={}){
+      window.__lowPowerMode = !!on;
+      document.body.classList.toggle('low-power', window.__lowPowerMode);
+      if(opts.persist !== false) localStorage.setItem(KEY, window.__lowPowerMode ? '1' : '0');
+      if(window.__lowPowerMode && document.getAnimations){
+        document.getAnimations().forEach(a=>a.cancel());
+      }
+      updateHint();
+      dispatchEvent(new CustomEvent('ppt-low-power-change', {detail:{on:window.__lowPowerMode}}));
+      if(window.__playSlide) window.__playSlide(window.__currentSlideIndex || 0);
+    };
+    document.body.classList.toggle('low-power', window.__lowPowerMode);
+    addEventListener('DOMContentLoaded', updateHint, {once:true});
+  })();
+</script>
+
+<canvas id="bg-dark" class="bg"></canvas>
+<canvas id="bg-light" class="bg"></canvas>
+<div id="hint">← → 翻页 · B 静态 · ESC 索引</div>
+
+<div id="deck">
+
+<!-- ============================================================
+     SLIDES 插入区 · 在此处填充所有 <section class="slide ..."> 页面
+     每页模板参考 references/page-patterns.md
+     页面组件参考 references/components.md
+     ============================================================ -->
+
+<section class="slide hero dark">
+  <div class="chrome">
+    <div>Macondo Reading · Fan Ye Translation</div>
+    <div>Vol.01</div>
+  </div>
+  <div class="frame" style="display:grid; gap:4vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>全书深度总体分析</div>
+    <h1 class="h-hero" data-anim>百年孤独</h1>
+    <h2 class="h-sub" data-anim>时间的迷宫，孤独的史诗，命运的循环</h2>
+    <p class="lead" style="max-width:62vw" data-anim>
+      从冰块的童年奇迹到飓风的终极抹除，一座城镇在纸页上诞生、繁荣、腐烂，并把整个二十世纪的创伤折叠进一个家族的名字里。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>基于范晔译本全文</span><span>·</span><span>结合全书总体分析 md</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>文学分享网页版 PPT</div>
+    <div>2026</div>
+  </div>
+</section>
+
+<section class="slide light">
+  <div class="chrome">
+    <div>Opening Coordinates · 全书尺度</div>
+    <div>01 / 16</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>先把迷宫摊开</div>
+    <h2 class="h-xl" data-anim>一部小说，六个入口</h2>
+    <p class="lead" style="max-width:68vw; margin-bottom:4vh" data-anim>
+      《百年孤独》不是按时间前进的家族史，而是一台把历史、血缘、记忆和预言同时卷入的叙事机器。
+    </p>
+    <div class="grid-6" style="margin-top:2vh">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Chapters</div>
+        <div class="stat-nb">20 <span class="stat-unit">章</span></div>
+        <div class="stat-note">创世、战争、雨季、终章，构成完整圆环。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Generations</div>
+        <div class="stat-nb">7 <span class="stat-unit">代</span></div>
+        <div class="stat-note">名字反复出现，性格像遗传病一样回返。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Wars</div>
+        <div class="stat-nb">32 <span class="stat-unit">场</span></div>
+        <div class="stat-note">革命从理想进入权力，再进入虚无。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Rain</div>
+        <div class="stat-nb" style="font-size:4.1vw">4.11.2</div>
+        <div class="stat-note">四年十一个月零两天，雨把历史泡成停滞。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Massacre</div>
+        <div class="stat-nb">3000</div>
+        <div class="stat-note">被装上火车的死者，随后被官方叙事抹去。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Parchment</div>
+        <div class="stat-nb">1 <span class="stat-unit">卷</span></div>
+        <div class="stat-note">羊皮卷把书写者、被书写者和读者合为一体。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Deck Thesis · 宏观地图</div>
+    <div>Macondo</div>
+  </div>
+</section>
+
+<section class="slide dark">
+  <div class="chrome">
+    <div>Narrative Architecture · 圆环结构</div>
+    <div>02 / 16</div>
+  </div>
+  <div class="frame grid-2-7-5" style="padding-top:6vh">
+    <div class="col" style="gap:2.4vh">
+      <div class="kicker" data-anim>它不是直线</div>
+      <h2 class="h-xl" style="font-size:5.4vw" data-anim>一切都在回到起点</h2>
+      <p class="lead" data-anim>
+        小说的首尾不是互相致意，而是互相咬合：冰块、栗树、蚂蚁、羊皮卷和飓风，共同把布恩迪亚家的百年锁成一个闭环。
+      </p>
+      <div class="callout" data-anim>
+        <span class="q-big">“第一个人被捆在树上，最后一个人正被蚂蚁吃掉。”</span>
+        <span class="callout-src">范晔译本 · 终章结构锚点</span>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.4vw; align-self:center" data-anim>
+      <div style="border-top:1px solid currentColor; padding-top:2vh; min-height:18vh">
+        <div class="meta">Origin</div>
+        <div class="h-md" style="margin-top:1.2vh">冰块</div>
+        <p class="body-zh" style="margin-top:1vh">世界仍可被命名，奇迹像科学一样冷。</p>
+      </div>
+      <div style="border-top:1px solid currentColor; padding-top:2vh; min-height:18vh">
+        <div class="meta">Captivity</div>
+        <div class="h-md" style="margin-top:1.2vh">栗树</div>
+        <p class="body-zh" style="margin-top:1vh">理性崩溃后，创始者被钉在家族中心。</p>
+      </div>
+      <div style="border-top:1px solid currentColor; padding-top:2vh; min-height:18vh">
+        <div class="meta">Script</div>
+        <div class="h-md" style="margin-top:1.2vh">羊皮卷</div>
+        <p class="body-zh" style="margin-top:1vh">所有事件早已写下，只等最后的人读完。</p>
+      </div>
+      <div style="border-top:1px solid currentColor; padding-top:2vh; min-height:18vh">
+        <div class="meta">Erasure</div>
+        <div class="h-md" style="margin-top:1.2vh">飓风</div>
+        <p class="body-zh" style="margin-top:1vh">城镇被从记忆中连根拔起，圆环闭合。</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>循环 · 折叠 · 镜像</div>
+    <div>Structure</div>
+  </div>
+</section>
+
+<section class="slide light" data-animate="pipeline">
+  <div class="chrome">
+    <div>Time Machine · 时间的三种病症</div>
+    <div>03 / 16</div>
+  </div>
+  <div class="frame" style="padding-top:6vh">
+    <div class="kicker" data-anim>时间不是背景，是主角</div>
+    <h2 class="h-xl" style="font-size:5.7vw" data-anim>马孔多患上时间病</h2>
+    <p class="lead" style="max-width:70vw" data-anim>
+      范晔译本中那些关于星期一、记忆、预言和房间的细节，揭示了同一件事：布恩迪亚家族从未真正生活在流动的当下。
+    </p>
+    <div class="pipeline-section">
+      <div class="pipeline-label">Press Arrow · Step by Step</div>
+      <div class="pipeline" data-cols="4">
+        <div class="step" data-anim="step">
+          <div class="step-nb">01</div>
+          <div class="step-title">线性时间</div>
+          <div class="step-desc">钟表、火车、公司和行政秩序进入马孔多，制造现代性的幻觉。</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">02</div>
+          <div class="step-title">循环时间</div>
+          <div class="step-desc">名字重复，性格重复，欲望重复，失败也以同样姿势归来。</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">03</div>
+          <div class="step-title">断裂时间</div>
+          <div class="step-desc">失眠症与遗忘症让词语脱离事物，让人失去自己的过去。</div>
+        </div>
+        <div class="step" data-anim="step">
+          <div class="step-nb">04</div>
+          <div class="step-title">预言时间</div>
+          <div class="step-desc">羊皮卷把百年日常集中在一起，使所有事件仿佛同时发生。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>“时间这个机器散架了”</div>
+    <div>Temporal Logic</div>
+  </div>
+</section>
+
+<section class="slide hero light">
+  <div class="chrome">
+    <div>Macondo · 空间史</div>
+    <div>04 / 16</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>一座城镇的三次变形</div>
+    <h1 class="h-hero" style="font-size:7.2vw" data-anim>伊甸园，战场，废墟</h1>
+    <div class="grid-3" style="gap:4vw; margin-top:2vh">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Phase 01</div>
+        <div class="stat-nb" style="font-size:4vw">创世</div>
+        <div class="stat-note">河水清澈，石头洁白，许多事物还没有名字。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Phase 02</div>
+        <div class="stat-nb" style="font-size:4vw">入侵</div>
+        <div class="stat-note">战争、火车、香蕉公司与外来秩序改变了空间的语法。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Phase 03</div>
+        <div class="stat-nb" style="font-size:4vw">抹除</div>
+        <div class="stat-note">雨、杂草、蚂蚁和飓风接管了人类的住宅。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>马孔多不是地点，是历史的浓缩模型</div>
+    <div>Space</div>
+  </div>
+</section>
+
+<section class="slide dark">
+  <div class="chrome">
+    <div>One Hundred Years of Solitude · 孤独谱系</div>
+    <div>05 / 16</div>
+  </div>
+  <div class="frame" style="padding-top:6vh">
+    <div class="kicker" data-anim>孤独不是一种情绪</div>
+    <h2 class="h-xl" style="font-size:5.7vw" data-anim>它有十二张面孔</h2>
+    <p class="lead" style="max-width:72vw; margin-bottom:5vh" data-anim>
+      总体分析把孤独分成探索、战争、拒绝、自我放逐、美、权力、遗忘、守护、爱情等变奏。它们共同指向同一个结论：孤独不是外部困境，而是存在方式。
+    </p>
+    <div class="grid-4">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Exploration</div>
+        <div class="stat-nb" style="font-size:4.4vw">探索</div>
+        <div class="stat-note">何塞·阿尔卡蒂奥·布恩迪亚追求绝对知识，最终被自己的理性放逐。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">War</div>
+        <div class="stat-nb" style="font-size:4.4vw">战争</div>
+        <div class="stat-note">上校赢得传奇，却失去与他人真实相遇的能力。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Refusal</div>
+        <div class="stat-nb" style="font-size:4.4vw">拒绝</div>
+        <div class="stat-note">阿玛兰妲把自由变成自我惩罚，把黑纱变成命运徽章。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Love</div>
+        <div class="stat-nb" style="font-size:4.4vw">爱情</div>
+        <div class="stat-note">最后的爱情最炽烈，也最彻底地完成家族的封闭。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>从心理孤独到存在孤独</div>
+    <div>Theme</div>
+  </div>
+</section>
+
+<section class="slide hero dark" data-animate="quote">
+  <div class="chrome">
+    <div>Classic Scene · 沟通失败</div>
+    <div>06 / 16</div>
+  </div>
+  <div class="frame center" style="gap:5vh">
+    <div class="kicker" data-anim>七个字承载一座城的荒凉</div>
+    <h1 class="h-hero" style="font-size:8vw" data-anim="line">马孔多在下雨。</h1>
+    <p class="lead" style="max-width:66vw" data-anim="line">
+      这不是天气报告，而是一封没有被读懂的求救电报。孤独最痛的地方，不是无人可说，而是说出口之后仍被解释为寻常。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>赫里内勒多的雨</span><span>·</span><span>上校的冷漠电码</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Rain as Loneliness</div>
+    <div>Quote</div>
+  </div>
+</section>
+
+<section class="slide light" data-animate="directional">
+  <div class="chrome">
+    <div>Family Code · 名字与性格</div>
+    <div>07 / 16</div>
+  </div>
+  <div class="frame" style="padding-top:6vh">
+    <div class="kicker" data-anim>命名就是预言</div>
+    <h2 class="h-xl" style="font-size:5.5vw" data-anim>布恩迪亚家的基因语法</h2>
+    <div class="grid-2-6-6" style="margin-top:7vh">
+      <div data-anim="left">
+        <div class="meta">Jose Arcadio</div>
+        <h3 class="h-md" style="margin-top:1vh">向外冲撞的人</h3>
+        <div class="rule"></div>
+        <p class="body-zh">他们更接近身体、行动、欲望和突然的离家。名字像一把向外开的门，通往冒险，也通往失控。</p>
+      </div>
+      <div data-anim="right">
+        <div class="meta">Aureliano</div>
+        <h3 class="h-md" style="margin-top:1vh">向内凝视的人</h3>
+        <div class="rule"></div>
+        <p class="body-zh">他们更接近沉默、洞察、金银器作坊和自我封闭。名字像一间越走越深的房间。</p>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:5vh" data-anim>
+      乌尔苏拉是唯一真正读懂这套语法的人。她越老越接近全知，也越清楚家族正在重复同一种失败。
+      <span class="callout-src">女性守护者 · 家族记忆</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>名字重复，命运也重复</div>
+    <div>Genealogy</div>
+  </div>
+</section>
+
+<section class="slide dark">
+  <div class="chrome">
+    <div>Women of Macondo · 守护与拒绝</div>
+    <div>08 / 16</div>
+  </div>
+  <div class="frame grid-2-8-4" style="padding-top:6vh">
+    <div>
+      <div class="kicker" data-anim>她们让家族暂时没有坍塌</div>
+      <h2 class="h-xl" style="font-size:5.1vw" data-anim>女性不是旁支，是支柱</h2>
+      <div style="margin-top:5vh" data-anim>
+        <div class="rowline">
+          <div class="k">乌尔苏拉</div>
+          <div class="v">守护房屋、糖果、账本与记忆；失明后反而看清命运。</div>
+          <div class="m">Witness</div>
+        </div>
+        <div class="rowline">
+          <div class="k">阿玛兰妲</div>
+          <div class="v">以拒绝保存自我，却也把自由缝进黑纱和寿衣。</div>
+          <div class="m">Refusal</div>
+        </div>
+        <div class="rowline">
+          <div class="k">丽贝卡</div>
+          <div class="v">外来者、食土者、放逐者，最后把孤独变成特权。</div>
+          <div class="m">Exile</div>
+        </div>
+        <div class="rowline">
+          <div class="k">费尔南达</div>
+          <div class="v">把贵族幻觉带入马孔多，成为旧秩序最后的滑稽堡垒。</div>
+          <div class="m">Order</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="align-self:end" data-anim>
+      美人儿蕾梅黛丝更像一个美学例外：她不参与现实的交易，却让现实在她身边失重。
+      <span class="callout-src">Remedios the Beauty</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>守护、拒绝、放逐、幻觉</div>
+    <div>Characters</div>
+  </div>
+</section>
+
+<section class="slide light">
+  <div class="chrome">
+    <div>Symbol Network · 意象系统</div>
+    <div>09 / 16</div>
+  </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>每个物象都带着命运</div>
+    <h2 class="h-xl" style="font-size:5.4vw" data-anim>从冰块到蚂蚁的符号地图</h2>
+    <div class="grid-9" style="margin-top:5vh">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Ice</div>
+        <div class="stat-nb" style="font-size:3vw">冰块</div>
+        <div class="stat-note">童年奇迹，时间凝固。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Rain</div>
+        <div class="stat-nb" style="font-size:3vw">雨</div>
+        <div class="stat-note">天罚、遗忘与历史浸泡。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Gold Fish</div>
+        <div class="stat-nb" style="font-size:3vw">小金鱼</div>
+        <div class="stat-note">循环劳作，对抗虚无。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Chestnut</div>
+        <div class="stat-nb" style="font-size:3vw">栗树</div>
+        <div class="stat-note">父权、囚禁与见证。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Parchment</div>
+        <div class="stat-nb" style="font-size:3vw">羊皮卷</div>
+        <div class="stat-note">命运脚本，元叙事装置。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Butterflies</div>
+        <div class="stat-nb" style="font-size:3vw">黄蝶</div>
+        <div class="stat-note">爱情与死亡的先兆。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Tail</div>
+        <div class="stat-nb" style="font-size:3vw">猪尾巴</div>
+        <div class="stat-note">乱伦恐惧，血脉终局。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Mirror</div>
+        <div class="stat-nb" style="font-size:3vw">镜子</div>
+        <div class="stat-note">自我反射，无限封闭。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Hurricane</div>
+        <div class="stat-nb" style="font-size:3vw">飓风</div>
+        <div class="stat-note">抹除、终结与再无机会。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>Symbol as Structure</div>
+    <div>Imagery</div>
+  </div>
+</section>
+
+<section class="slide dark">
+  <div class="chrome">
+    <div>History and Violence · 拉美寓言</div>
+    <div>10 / 16</div>
+  </div>
+  <div class="frame" style="padding-top:6vh">
+    <div class="kicker" data-anim>暴力从来不是偶发事件</div>
+    <h2 class="h-xl" style="font-size:5.5vw" data-anim>私人冲突一路长成国家恐怖</h2>
+    <p class="lead" style="max-width:72vw; margin-bottom:5vh" data-anim>
+      小说把拉美历史压缩成马孔多百年：殖民记忆、内战循环、香蕉公司、屠杀与官方失忆，全部嵌进一个家族的日常。
+    </p>
+    <div class="pipeline-section" style="border-top:0; margin-top:0">
+      <div class="pipeline" data-cols="4">
+        <div class="step" data-anim>
+          <div class="step-nb">01</div>
+          <div class="step-title">私人暴力</div>
+          <div class="step-desc">斗鸡、决斗、欲望与羞辱，家族从创世之初就带着血。</div>
+        </div>
+        <div class="step" data-anim>
+          <div class="step-nb">02</div>
+          <div class="step-title">革命循环</div>
+          <div class="step-desc">战争越打越像惯性，理想慢慢被权力和荣誉腐蚀。</div>
+        </div>
+        <div class="step" data-anim>
+          <div class="step-nb">03</div>
+          <div class="step-title">资本入侵</div>
+          <div class="step-desc">火车带来香蕉公司，也带来外部秩序对土地的重新编码。</div>
+        </div>
+        <div class="step" data-anim>
+          <div class="step-nb">04</div>
+          <div class="step-title">历史失忆</div>
+          <div class="step-desc">屠杀发生以后，最可怕的不是死亡，而是死亡被宣布从未发生。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>香蕉公司 · 火车 · 三千死者</div>
+    <div>Politics</div>
+  </div>
+</section>
+
+<section class="slide hero light">
+  <div class="chrome">
+    <div>Magical Realism · 美学机制</div>
+    <div>11 / 16</div>
+  </div>
+  <div class="frame" style="display:grid; gap:5vh; align-content:center; min-height:80vh">
+    <div class="kicker" data-anim>魔幻不是逃离现实</div>
+    <h1 class="h-hero" style="font-size:6.8vw" data-anim>它让现实露出骨头</h1>
+    <p class="lead" style="max-width:70vw" data-anim>
+      马尔克斯的魔幻从不要求解释。升天、鬼魂、失眠症、会预言的羊皮卷，都以日常口吻出现，因此荒诞不削弱现实，反而让现实更准确。
+    </p>
+    <div class="grid-3" style="gap:4vw">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Tone</div>
+        <div class="stat-nb" style="font-size:3.5vw">平静叙述</div>
+        <div class="stat-note">最不可思议的事，被讲得像村中旧闻。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Detail</div>
+        <div class="stat-nb" style="font-size:3.5vw">精确荒诞</div>
+        <div class="stat-note">具体数字和物质细节让神话落地。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">History</div>
+        <div class="stat-nb" style="font-size:3.5vw">历史显影</div>
+        <div class="stat-note">魔幻承担被现实制度遮蔽的真相。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>魔幻现实主义的核心不是奇观，而是认识论</div>
+    <div>Aesthetics</div>
+  </div>
+</section>
+
+<section class="slide dark">
+  <div class="chrome">
+    <div>Love and Incest · 爱情的不可能</div>
+    <div>12 / 16</div>
+  </div>
+  <div class="frame grid-2-7-5" style="padding-top:6vh">
+    <div>
+      <div class="kicker" data-anim>爱情越炽烈，圆环越紧</div>
+      <h2 class="h-xl" style="font-size:5.4vw" data-anim>所有爱情都没能把人带出去</h2>
+      <p class="lead" style="margin-top:2vh" data-anim>
+        纯真之爱、被拒之爱、肉体之爱、权力之爱，最终都没有打开布恩迪亚家的门。终章那场看似最完整的爱情，恰恰完成了最古老的禁忌。
+      </p>
+      <div class="callout" style="margin-top:5vh" data-anim>
+        爱在这里不是救赎，而是孤独改变形状之后的回声。
+        <span class="callout-src">Love as Solitude</span>
+      </div>
+    </div>
+    <div class="grid-4" style="gap:2.6vh 2vw; align-self:center">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Pure</div>
+        <div class="stat-nb" style="font-size:2.8vw">蕾梅黛丝</div>
+        <div class="stat-note">纯真太轻，无法属于尘世。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Refused</div>
+        <div class="stat-nb" style="font-size:2.8vw">阿玛兰妲</div>
+        <div class="stat-note">拒绝成为她的自由，也成为她的牢房。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Body</div>
+        <div class="stat-nb" style="font-size:2.8vw">庇拉尔</div>
+        <div class="stat-note">欲望延续血脉，却不提供真正联结。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Final</div>
+        <div class="stat-nb" style="font-size:2.8vw">终章之爱</div>
+        <div class="stat-note">最伟大的爱情，也是血脉的最后封印。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>爱情 · 孤独 · 禁忌</div>
+    <div>Desire</div>
+  </div>
+</section>
+
+<section class="slide light">
+  <div class="chrome">
+    <div>Craft · 叙事技艺</div>
+    <div>13 / 16</div>
+  </div>
+  <div class="frame" style="padding-top:6vh">
+    <div class="kicker" data-anim>为什么它会成为经典</div>
+    <h2 class="h-xl" style="font-size:5.6vw" data-anim>形式与命运互为镜像</h2>
+    <div style="margin-top:6vh" data-anim>
+      <div class="rowline">
+        <div class="k">预叙</div>
+        <div class="v">未来死亡先于童年奇迹出现，让每个当下都带着宿命的阴影。</div>
+        <div class="m">Foreshadow</div>
+      </div>
+      <div class="rowline">
+        <div class="k">反复</div>
+        <div class="v">名字、事件、姿态和失败不断回返，使结构本身成为主题。</div>
+        <div class="m">Variation</div>
+      </div>
+      <div class="rowline">
+        <div class="k">全知</div>
+        <div class="v">叙述者俯瞰过去与未来，像梅尔基亚德斯站在时间之外。</div>
+        <div class="m">Omniscience</div>
+      </div>
+      <div class="rowline">
+        <div class="k">反讽</div>
+        <div class="v">宏大理想与琐碎肉身同台出现，史诗因此保持人的温度。</div>
+        <div class="m">Irony</div>
+      </div>
+      <div class="rowline">
+        <div class="k">元叙事</div>
+        <div class="v">终章的阅读行为让小说、羊皮卷、读者和最后一个奥雷里亚诺重叠。</div>
+        <div class="m">Metafiction</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>语言、结构与主题的同构</div>
+    <div>Technique</div>
+  </div>
+</section>
+
+<section class="slide dark">
+  <div class="chrome">
+    <div>Reading Map · 如何重读</div>
+    <div>14 / 16</div>
+  </div>
+  <div class="frame" style="padding-top:6vh">
+    <div class="kicker" data-anim>给下一次阅读的路线</div>
+    <h2 class="h-xl" style="font-size:5.5vw" data-anim>不要只追情节，追那些回声</h2>
+    <p class="lead" style="max-width:70vw; margin-bottom:5vh" data-anim>
+      读《百年孤独》最有效的方法，是把它当作一张可以反复折叠的地图：每次只跟随一种线索，直到它把你带回同一个中心。
+    </p>
+    <div class="grid-4">
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Route 01</div>
+        <div class="stat-nb" style="font-size:3.1vw">时间线</div>
+        <div class="stat-note">标出所有“多年以后”和预言回收点。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Route 02</div>
+        <div class="stat-nb" style="font-size:3.1vw">名字线</div>
+        <div class="stat-note">比较何塞·阿尔卡蒂奥与奥雷里亚诺的性格分叉。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Route 03</div>
+        <div class="stat-nb" style="font-size:3.1vw">意象线</div>
+        <div class="stat-note">追踪冰、雨、黄蝶、羊皮卷和蚂蚁。</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-label">Route 04</div>
+        <div class="stat-nb" style="font-size:3.1vw">历史线</div>
+        <div class="stat-note">把马孔多的现代化和拉美创伤并置阅读。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>阅读不是离开迷宫，而是学会辨认迷宫</div>
+    <div>Method</div>
+  </div>
+</section>
+
+<section class="slide light">
+  <div class="chrome">
+    <div>World Literature · 文学史位置</div>
+    <div>15 / 16</div>
+  </div>
+  <div class="frame grid-2-6-6" style="padding-top:7vh">
+    <div>
+      <div class="kicker" data-anim>地方越具体，寓言越普遍</div>
+      <h2 class="h-xl" style="font-size:5vw" data-anim>马孔多是一座虚构城镇，也是一种阅读世界的方法</h2>
+    </div>
+    <div class="col" style="gap:3vh">
+      <p class="lead" data-anim>
+        它把拉丁美洲的殖民、内战、资本入侵和历史失忆，写成一种人人都能识别的处境：人怎样在孤独中建立家族、城市、国家，又怎样亲手毁掉它们。
+      </p>
+      <div class="callout" data-anim>
+        这就是它的伟大：不是把现实变成神话，而是证明现实本身早已具有神话的重量。
+        <span class="callout-src">Literary Significance</span>
+      </div>
+      <div class="meta-row" data-anim>
+        <span>拉美文学爆炸</span><span>·</span><span>世界文学经典</span><span>·</span><span>中国家族叙事的回声</span>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div>从地方史到人类寓言</div>
+    <div>Canon</div>
+  </div>
+</section>
+
+<section class="slide hero dark" data-animate="quote">
+  <div class="chrome">
+    <div>Closing · 从冰块到飓风</div>
+    <div>16 / 16</div>
+  </div>
+  <div class="frame center" style="gap:5vh">
+    <div class="kicker" data-anim>终章之后，城镇消失；阅读开始</div>
+    <h1 class="h-hero" style="font-size:7.6vw" data-anim="line">文学保存被抹去的世界</h1>
+    <p class="lead" style="max-width:68vw" data-anim="line">
+      飓风可以带走马孔多，官方叙事可以抹去死者，家族血脉可以断绝。但小说把这一切重新放回记忆，让孤独不再只是沉默，而成为可以被共同阅读的形式。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>Ice</span><span>·</span><span>Rain</span><span>·</span><span>Parchment</span><span>·</span><span>Hurricane</span>
+    </div>
+  </div>
+  <div class="foot">
+    <div>百年孤独全书深度总体分析</div>
+    <div>End</div>
+  </div>
+</section>
+
+</div>
+
+<div id="nav"></div>
+
+<script>
+/* =============== WebGL 双背景 ===============
+   深色页：Holographic Dispersion（全息色散 · 钛金暗流）—— 彩虹微扰、鼠标径向涟漪
+   浅色页：Spiral Vortex（旋转涡流 · 银色珍珠）—— domain-warp 流动、无中心
+   修改风格请参考 references/webgl-backgrounds.md
+*/
+const VS = `attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`;
+
+const FS_DARK = `precision highp float;
+uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;
+vec3 palette(float t,vec3 a,vec3 b,vec3 c,vec3 d){return a+b*cos(6.28318*(c*t+d));}
+void main(){
+  vec2 uv=gl_FragCoord.xy/u_resolution.xy;
+  vec2 p=uv*2.0-1.0;p.x*=u_resolution.x/u_resolution.y;
+  vec2 m=u_mouse*2.0-1.0;m.x*=u_resolution.x/u_resolution.y;
+  float md=length(p-m);
+  float mr=sin(md*15.0-u_time*4.0)*exp(-md*3.0);p+=mr*0.08;
+  vec2 p0=p;
+  for(float i=1.0;i<4.0;i++){
+    p.x+=0.1/i*sin(i*3.0*p.y+u_time*0.4)+0.05;
+    p.y+=0.1/i*cos(i*2.0*p.x+u_time*0.3)-0.05;
+  }
+  float r=length(p);float ang=atan(p.y,p.x);
+  vec3 a=vec3(0.12,0.12,0.13);
+  vec3 b=vec3(0.03,0.04,0.05);
+  vec3 c=vec3(1.0,1.0,1.0);
+  vec3 d=vec3(0.1,0.2,0.4);
+  vec3 col=palette(r*1.5+p0.x*0.5+u_time*0.1,a,b,c,d);
+  float disp=sin(r*25.0-u_time*1.5+ang*2.0)*0.5+0.5;
+  col+=vec3(disp*0.015,disp*0.01,disp*0.02);
+  float hi=pow(sin(p.x*4.0+p.y*3.0+u_time)*0.5+0.5,8.0);
+  col+=hi*0.08;
+  vec3 base=vec3(0.05,0.05,0.06);
+  col=mix(base,col,0.85);
+  gl_FragColor=vec4(col,1.0);
+}`;
+
+const FS_LIGHT = `precision highp float;
+uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noise(vec2 p){
+  vec2 i=floor(p),f=fract(p);
+  float a=hash(i),b=hash(i+vec2(1,0));
+  float c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));
+  vec2 u=f*f*(3.0-2.0*f);
+  return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
+}
+float fbm(vec2 p){
+  float v=0.0,a=0.5;
+  mat2 m=mat2(0.80,0.60,-0.60,0.80);
+  for(int i=0;i<5;i++){v+=a*noise(p);p=m*p*2.02;a*=0.5;}
+  return v;
+}
+void main(){
+  vec2 uv=gl_FragCoord.xy/u_resolution.xy;
+  vec2 p=uv;p.x*=u_resolution.x/u_resolution.y;
+  vec2 m=u_mouse;m.x*=u_resolution.x/u_resolution.y;
+  vec2 md=p-m;float dl=length(md);
+  p+=normalize(md+vec2(0.0001))*exp(-dl*5.0)*0.03;
+  vec2 q=vec2(fbm(p*1.8+u_time*0.07),fbm(p*1.8+vec2(5.2,1.3)+u_time*0.06));
+  vec2 r=vec2(fbm(p*2.0+q*1.3+vec2(1.7,9.2)+u_time*0.05),
+              fbm(p*2.0+q*1.3+vec2(8.3,2.8)+u_time*0.04));
+  float f=fbm(p*2.2+r*1.5);
+  vec3 silverDark=vec3(0.86,0.85,0.84);
+  vec3 paper=vec3(0.955,0.945,0.925);
+  vec3 col=mix(silverDark,paper,f);
+  float ph=r.x*2.2+u_time*0.35;
+  col+=vec3(0.78,0.62,0.92)*sin(ph)*0.055;
+  col+=vec3(0.55,0.72,0.95)*sin(ph*0.8+2.0)*0.05;
+  float hl=smoothstep(0.48,0.92,f);
+  col+=hl*0.06;
+  gl_FragColor=vec4(col,1.0);
+}`;
+
+const mouse={x:0.5,y:0.5};
+addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight});
+
+function bootGL(canvasId, fsSrc){
+  const canvas=document.getElementById(canvasId);
+  const gl=canvas.getContext('webgl',{alpha:false,antialias:true});
+  if(!gl) return ()=>false;
+  const mk=(t,s)=>{const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh};
+  const prog=gl.createProgram();
+  gl.attachShader(prog,mk(gl.VERTEX_SHADER,VS));
+  gl.attachShader(prog,mk(gl.FRAGMENT_SHADER,fsSrc));
+  gl.linkProgram(prog);gl.useProgram(prog);
+  const buf=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+  const pos=gl.getAttribLocation(prog,'position');
+  gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+  const lRes=gl.getUniformLocation(prog,'u_resolution');
+  const lT=gl.getUniformLocation(prog,'u_time');
+  const lM=gl.getUniformLocation(prog,'u_mouse');
+  const resize=()=>{
+    const d=Math.min(window.devicePixelRatio||1,2);
+    canvas.width=innerWidth*d;canvas.height=innerHeight*d;
+    gl.viewport(0,0,canvas.width,canvas.height);
+  };
+  addEventListener('resize',resize);resize();
+  return (tSec)=>{
+    gl.uniform2f(lRes,canvas.width,canvas.height);
+    gl.uniform1f(lT,tSec);
+    gl.uniform2f(lM,mouse.x,1-mouse.y);
+    gl.drawArrays(gl.TRIANGLES,0,6);
+    return true;
+  };
+}
+let drawDark=null, drawLight=null, glRAF=0, glT0=Date.now();
+function startGL(){
+  if(window.__lowPowerMode || glRAF) return;
+  if(!drawDark) drawDark=bootGL('bg-dark',FS_DARK);
+  if(!drawLight) drawLight=bootGL('bg-light',FS_LIGHT);
+  glT0=Date.now();
+  function loop(){
+    if(window.__lowPowerMode){glRAF=0;return;}
+    const t=(Date.now()-glT0)/1000;
+    drawDark(t);drawLight(t);
+    glRAF=requestAnimationFrame(loop);
+  }
+  glRAF=requestAnimationFrame(loop);
+}
+function stopGL(){
+  if(glRAF) cancelAnimationFrame(glRAF);
+  glRAF=0;
+}
+startGL();
+addEventListener('ppt-low-power-change', e=>{e.detail.on ? stopGL() : startGL();});
+
+// =============== 导航（翻页 / 圆点 / 键盘 / 滚轮 / 触屏） ===============
+const deck=document.getElementById('deck');
+const slides=deck.querySelectorAll('.slide');
+const nav=document.getElementById('nav');
+let idx=0,total=slides.length,lock=false;
+
+// 关键：矫正 deck 宽度为 total * 100vw，否则翻页会错位
+deck.style.width=(total*100)+'vw';
+
+slides.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.className='dot';b.dataset.i=i;b.setAttribute('aria-label','Page '+(i+1));
+  b.onclick=()=>go(i);
+  nav.appendChild(b);
+});
+
+function go(n){
+  if(lock)return;
+  idx=Math.max(0,Math.min(total-1,n));
+  window.__currentSlideIndex = idx;
+  deck.style.transform=`translateX(${-idx*100}vw)`;
+  nav.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+  /* 主题切换：优先读 data-theme，其次从 class（light/dark）推断 */
+  const el=slides[idx];
+  const th=el.dataset.theme || (el.classList.contains('light')?'light':(el.classList.contains('dark')?'dark':'dark'));
+  document.body.classList.toggle('light-bg',th==='light');
+  /* 动效：翻页过渡中段触发当前页的入场动画（由 motion-boot 注册） */
+  if(window.__playSlide) setTimeout(()=>window.__playSlide(idx), 450);
+  lock=true;setTimeout(()=>lock=false,700);
+}
+
+/* =============== ESC 索引视图 =============== */
+let overviewOn=false;
+const ov=document.createElement('div');
+ov.id='overview';
+ov.style.cssText='position:fixed;inset:0;z-index:100;background:rgba(var(--ink-rgb),.92);backdrop-filter:blur(12px);display:none;overflow-y:auto;padding:4vh 4vw';
+document.body.appendChild(ov);
+
+function buildOverview(){
+  ov.innerHTML='';
+  const grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:2vh 1.6vw;max-width:90vw;margin:0 auto';
+  slides.forEach((s,i)=>{
+    const card=document.createElement('div');
+    card.style.cssText='cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid '+(i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)')+';transition:border-color .2s';
+    card.onmouseenter=()=>card.style.borderColor='rgba(var(--paper-rgb),.6)';
+    card.onmouseleave=()=>card.style.borderColor=i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)';
+    const wrap=document.createElement('div');
+    wrap.style.cssText='width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;pointer-events:none;background:'+(s.classList.contains('light')?'var(--paper)':'var(--ink)');
+    const clone=s.cloneNode(true);
+    clone.style.cssText='width:100vw;height:100vh;transform:scale('+(1/4.5)+');transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none';
+    wrap.appendChild(clone);
+    const label=document.createElement('div');
+    label.style.cssText='padding:6px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper);opacity:.7';
+    label.textContent=(i+1)+' / '+total;
+    card.appendChild(wrap);
+    card.appendChild(label);
+    card.onclick=()=>{toggleOverview();go(i)};
+    grid.appendChild(card);
+  });
+  ov.appendChild(grid);
+}
+
+function toggleOverview(){
+  overviewOn=!overviewOn;
+  if(overviewOn){buildOverview();ov.style.display='block';}
+  else{ov.style.display='none';}
+}
+
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleOverview();return;}
+  if(e.key && e.key.toLowerCase()==='b' && !e.metaKey && !e.ctrlKey && !e.altKey){
+    e.preventDefault();
+    window.__setLowPowerMode(!window.__lowPowerMode);
+    return;
+  }
+  if(overviewOn)return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '||e.key==='ArrowDown'){
+    if(window.__pipeAdvance && window.__pipeAdvance()) return;
+    go(idx+1);
+    return;
+  }
+  if(e.key==='ArrowLeft'||e.key==='PageUp'||e.key==='ArrowUp')go(idx-1);
+  if(e.key==='Home')go(0);
+  if(e.key==='End')go(total-1);
+});
+
+let wheelTO=null,wheelAcc=0;
+addEventListener('wheel',e=>{
+  wheelAcc+=e.deltaY+e.deltaX;
+  if(Math.abs(wheelAcc)>50){
+    if(wheelAcc>0 && window.__pipeAdvance && window.__pipeAdvance()){
+      wheelAcc=0;
+    }else{
+      go(idx+(wheelAcc>0?1:-1));wheelAcc=0;
+    }
+  }
+  clearTimeout(wheelTO);wheelTO=setTimeout(()=>wheelAcc=0,150);
+},{passive:true});
+
+let tx=0,ty=0;
+addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+addEventListener('touchend',e=>{
+  const dx=(e.changedTouches[0].clientX-tx);
+  const dy=(e.changedTouches[0].clientY-ty);
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){
+    if(dx<0 && window.__pipeAdvance && window.__pipeAdvance()) return;
+    go(idx+(dx<0?1:-1));
+  }
+},{passive:true});
+
+go(0);
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+
+<!-- ============ Motion One 动效引擎（本地优先,CDN 兜底） ============
+     加载策略:先 ./assets/motion.min.js(本地,离线可用),失败 fallback 到 jsDelivr CDN
+     加载完成后挂 window.__playSlide / window.__pipeAdvance,
+     导航脚本会在翻页中段调用 __playSlide(idx),键盘/滚轮/触屏会在翻页前调用 __pipeAdvance()
+     双双失败时会兜底把所有 [data-anim] 设为可见,不让动效破坏阅读
+-->
+<script type="module">
+let motion;
+try {
+  motion = await import('./assets/motion.min.js');
+} catch(e1) {
+  try {
+    motion = await import('https://cdn.jsdelivr.net/npm/motion@11.11.17/+esm');
+  } catch(e2) {
+    console.warn('[motion] local + CDN both failed, disabling animations', e1, e2);
+    document.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity='1';el.style.transform='none'});
+    document.querySelectorAll('[data-animate="pipeline"] [data-anim]').forEach(el=>el.style.opacity='1');
+  }
+}
+
+if(motion){
+  const { animate, stagger } = motion;
+  document.body.classList.add('motion-ready');
+  const EASE = [.22, 1, .36, 1];
+  const slides = [...document.querySelectorAll('.slide')];
+  let pipeStep = -1;
+  let lastIdx = -1;
+
+  function resetAnims(slide){
+    slide.querySelectorAll('[data-anim]').forEach(el=>{
+      el.style.opacity='';
+      el.style.transform='';
+    });
+  }
+
+  function revealStatic(slide){
+    resetAnims(slide);
+    document.getAnimations?.().forEach(a=>a.cancel());
+    slide.querySelectorAll('[data-anim]').forEach(el=>{
+      el.style.opacity='1';
+      el.style.transform='none';
+    });
+  }
+
+  function playSlide(i){
+    const slide = slides[i];
+    if(!slide) return;
+    lastIdx = i;
+    const recipe = slide.dataset.animate || (slide.classList.contains('hero') ? 'hero' : 'cascade');
+
+    if(window.__lowPowerMode){
+      revealStatic(slide);
+      return;
+    }
+
+    if(recipe === 'pipeline'){
+      pipeStep = -1;
+      slide.querySelectorAll('[data-anim]').forEach(el=>{
+        el.style.opacity='0.15';
+        el.style.transform='none';
+      });
+      return;
+    }
+
+    resetAnims(slide);
+    const all = [...slide.querySelectorAll('[data-anim]')];
+    if(!all.length) return;
+
+    if(recipe === 'directional'){
+      const lefts  = all.filter(el=>el.dataset.anim==='left');
+      const divs   = all.filter(el=>el.dataset.anim==='divider');
+      const rights = all.filter(el=>el.dataset.anim==='right');
+      const others = all.filter(el=>!['left','right','divider'].includes(el.dataset.anim));
+      if(others.length) animate(others, {opacity:[0,1], y:[12,0]}, {duration:.6, delay:stagger(.1, {start:.15}), easing:EASE});
+      if(lefts.length)  animate(lefts,  {opacity:[0,1], x:[-24,0]}, {duration:.8, delay:.35, easing:EASE});
+      if(divs.length)   animate(divs,   {opacity:[0,.25]},          {duration:.5, delay:.9});
+      if(rights.length) animate(rights, {opacity:[0,1], x:[24,0]},  {duration:.8, delay:1.0, easing:EASE});
+      return;
+    }
+
+    if(recipe === 'quote'){
+      const lines = all.filter(el=>el.dataset.anim==='line');
+      const others = all.filter(el=>el.dataset.anim!=='line');
+      if(others.length) animate(others, {opacity:[0,1], y:[8,0]},    {duration:.6, delay:stagger(.12, {start:.2}), easing:EASE});
+      if(lines.length)  animate(lines,  {opacity:[.35,1], y:[10,0]}, {duration:.8, delay:stagger(.55, {start:.5}), easing:EASE});
+      return;
+    }
+
+    if(recipe === 'hero'){
+      animate(all, {opacity:[0,1], y:[14,0]}, {duration:.9, delay:stagger(.16, {start:.2}), easing:EASE});
+      return;
+    }
+
+    // default: cascade
+    animate(all, {opacity:[0,1], y:[16,0]}, {duration:.75, delay:stagger(.1, {start:.15}), easing:EASE});
+  }
+
+  function pipeAdvance(){
+    if(window.__lowPowerMode) return false;
+    const slide = slides[lastIdx];
+    if(!slide || slide.dataset.animate !== 'pipeline') return false;
+    const steps  = [...slide.querySelectorAll('[data-anim="step"]')];
+    const arrows = [...slide.querySelectorAll('[data-anim="arrow"]')];
+    if(pipeStep >= steps.length - 1) return false;
+    pipeStep++;
+    animate(steps[pipeStep], {opacity:[0.15,1], y:[8,0]}, {duration:.5, easing:EASE});
+    if(pipeStep > 0 && arrows[pipeStep-1]){
+      animate(arrows[pipeStep-1], {opacity:[0.15,.7]}, {duration:.3, delay:.15});
+    }
+    return true;
+  }
+
+  window.__playSlide = playSlide;
+  window.__pipeAdvance = pipeAdvance;
+
+  // 首屏:go(0) 已跑过(同步),没来得及触发动效 → 这里补一下
+  playSlide(0);
+}
+</script>
+</body>
+</html>
